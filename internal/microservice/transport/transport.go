@@ -13,7 +13,6 @@ type LinkService interface {
 }
 
 type LinkTransportLogger interface {
-	Debugw(string, ...interface{})
 	Infow(string, ...interface{})
 	Errorw(string, ...interface{})
 }
@@ -37,8 +36,9 @@ func (lt *LinkTransport) Compress(ctx context.Context, link *proto.Link) (*proto
 	resp, err := lt.linkService.Compress(dLink)
 
 	if err != nil {
-		lt.logger.Infow("LinkTransport err",
+		lt.logger.Errorw("LinkTransport err",
 			"method", "Compress",
+			"calling", "lt.linkService.Compress",
 			"src link", link.Body,
 			"error", err)
 
@@ -59,8 +59,9 @@ func (lt *LinkTransport) Original(ctx context.Context, link *proto.Link) (*proto
 	resp, err := lt.linkService.Original(dLink)
 
 	if err != nil {
-		lt.logger.Infow("LinkTransport err",
+		lt.logger.Errorw("LinkTransport err",
 			"method", "Original",
+			"calling", "lt.linkService.Original",
 			"src link", link.Body,
 			"error", err)
 
