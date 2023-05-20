@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+// protoc --go_out=. --go-grpc_out=. --go-grpc_opt=paths=source_relative --go_opt=paths=source_relative *.proto  
+option go_package = "./;proto";
+
+package proto;
+
+message Link {
+  string body = 1;
+}
+
+service LinkCompresser {
+    rpc Compress (Link) returns (Link) {}
+    rpc Original (Link) returns (Link) {}
+}
+
