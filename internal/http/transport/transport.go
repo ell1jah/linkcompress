@@ -5,7 +5,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/ell1jah/linkcompress/internal/microservice/domain"
+	"github.com/ell1jah/linkcompress/internal/http/domain"
 )
 
 type ReqBody struct {

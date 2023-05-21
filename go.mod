@@ -17,6 +17,7 @@ require (
 
 require (
 	github.com/golang/protobuf v1.5.3 // indirect
+	github.com/gorilla/mux v1.8.0
 	github.com/jackc/pgx/v5 v5.3.1
 	go.uber.org/zap v1.24.0
 	golang.org/x/net v0.8.0 // indirect
