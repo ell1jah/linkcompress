@@ -5,7 +5,6 @@ import (
 	"sync"
 
 	"github.com/ell1jah/linkcompress/internal/microservice/domain"
-	"github.com/ell1jah/linkcompress/internal/proto"
 )
 
 const compressedLen = 10
@@ -25,7 +24,6 @@ type LinkServiceLogger interface {
 }
 
 type LinkService struct {
-	proto.UnimplementedLinkCompresserServer
 	linkRepo LinkRepo
 	logger   LinkServiceLogger
 	mu       sync.Mutex
