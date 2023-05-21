@@ -3,16 +3,19 @@ package repo
 import (
 	"context"
 	"database/sql"
+	"errors"
 
+	"github.com/ell1jah/linkcompress/internal/microservice/domain"
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
-const dataSource = "host=localhost port=8080 dbname=payments user=postgres password=postgres"
+const dataSource = "host=localhost port=5432 dbname=links user=docker password=postgres"
 const driver = "pgx"
 
 type PostgresRepo struct {
 	logger RepoLogger
 	ctx    context.Context
+	db     *sql.DB
 }
 
 func NewPostgresRepo(logger RepoLogger, ctx context.Context) (*PostgresRepo, error) {
@@ -45,21 +48,98 @@ func NewPostgresRepo(logger RepoLogger, ctx context.Context) (*PostgresRepo, err
 	return &PostgresRepo{
 		logger: logger,
 		ctx:    ctx,
+		db:     db,
 	}, nil
 }
 
-// func (pr *PostgresRepo) GetOriginal(compressed domain.Link) (domain.Link, error) {
+func (pr *PostgresRepo) GetOriginal(compressed domain.Link) (domain.Link, error) {
+	var res string
+	err := pr.db.QueryRow(`SELECT DISTINCT original FROM pairs WHERE compressed = $1;`, compressed).Scan(&res)
+	if errors.Is(err, sql.ErrNoRows) {
+		pr.logger.Infow("PostgresRepo log",
+			"method", "GetOriginal",
+			"src link", compressed,
+			"original link", "not found")
+		return "", nil
+	} else if err != nil {
+		pr.logger.Errorw("PostgresRepo err",
+			"method", "GetOriginal",
+			"src link", compressed,
+			"err", err)
+		return "", err
+	}
 
-// }
+	pr.logger.Infow("PostgresRepo log",
+		"method", "GetOriginal",
+		"src link", compressed,
+		"original link", res)
 
-// func (pr *PostgresRepo) GetCompressed(original domain.Link) (domain.Link, error) {
+	return domain.Link(res), err
+}
 
-// }
+func (pr *PostgresRepo) GetCompressed(original domain.Link) (domain.Link, error) {
+	var res string
+	err := pr.db.QueryRow(`SELECT DISTINCT compressed FROM pairs WHERE original = $1;`, original).Scan(&res)
+	if errors.Is(err, sql.ErrNoRows) {
+		pr.logger.Infow("PostgresRepo log",
+			"method", "GetCompressed",
+			"src link", original,
+			"compressed link", "not found")
+		return "", nil
+	} else if err != nil {
+		pr.logger.Errorw("PostgresRepo err",
+			"method", "GetCompressed",
+			"src link", original,
+			"err", err)
+		return "", err
+	}
 
-// func (pr *PostgresRepo) AddCompressed(original domain.Link, compressed domain.Link) error {
+	pr.logger.Infow("PostgresRepo log",
+		"method", "GetCompressed",
+		"src link", original,
+		"compressed link", res)
 
-// }
+	return domain.Link(res), err
+}
 
-// func (pr *PostgresRepo) GetLastCompressed() (domain.Link, error) {
+func (pr *PostgresRepo) AddCompressed(original domain.Link, compressed domain.Link) error {
+	_, err := pr.db.Exec(`INSERT INTO pairs(original, compressed) values ($1, $2);`, original, compressed)
+	if err != nil {
+		pr.logger.Errorw("PostgresRepo err",
+			"method", "AddCompressed",
+			"original link", original,
+			"compressed link", compressed,
+			"err", err)
 
-// }
+		return err
+	}
+
+	pr.logger.Infow("PostgresRepo log",
+		"method", "AddCompressed",
+		"original link", original,
+		"compressed link", compressed)
+
+	return nil
+}
+
+func (pr *PostgresRepo) GetLastCompressed() (domain.Link, error) {
+	var res string
+	err := pr.db.QueryRow(`SELECT compressed FROM pairs ORDER BY id DESC LIMIT 1;`).Scan(&res)
+	if errors.Is(err, sql.ErrNoRows) {
+		pr.logger.Infow("PostgresRepo log",
+			"method", "GetLastCompressed",
+			"last compressed link", "not found")
+		return "", nil
+	} else if err != nil {
+		pr.logger.Errorw("PostgresRepo err",
+			"method", "GetLastCompressed",
+			"err", err)
+		return "", err
+	}
+
+	pr.logger.Infow("PostgresRepo log",
+		"method", "GetCompressed",
+		"last compressed link", res)
+
+	return domain.Link(res), err
+}
