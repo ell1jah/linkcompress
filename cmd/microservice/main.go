@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"net"
 	"time"
@@ -15,14 +16,40 @@ import (
 	"google.golang.org/grpc/peer"
 )
 
-const addr = ":443"
+const addr = ":50051"
+const postgresStor = "postgres"
+const inMemoryStor = "inmem"
 
 func main() {
+	var storType = flag.String("stor", postgresStor, "storage type flag")
+	flag.Parse()
+	if *storType != postgresStor && *storType != inMemoryStor {
+		panic(fmt.Errorf("wrong storage type flag value"))
+	}
+
 	zapLogger := zap.Must(zap.NewDevelopment())
 	logger := zapLogger.Sugar()
 
-	repo := repo.NewInMemoryRepo(logger)
-	service := service.NewLinkService(repo, logger)
+	var repository service.LinkRepo
+	var err error
+
+	if *storType == postgresStor {
+		ctx, finish := context.WithCancel(context.Background())
+		defer func() {
+			finish()
+		}()
+
+		repository, err = repo.NewPostgresRepo(logger, ctx)
+		if err != nil {
+			logger.Fatalw("NewPostgresRepo err",
+				"err", err)
+			panic(err)
+		}
+	} else {
+		repository = repo.NewInMemoryRepo(logger)
+	}
+
+	service := service.NewLinkService(repository, logger)
 	transport := transport.NewLinkTransport(service, logger)
 
 	accLog := func(
@@ -64,6 +91,9 @@ func main() {
 
 		return reply, err
 	}
+
+	logger.Infow("starting server",
+		"addr", addr)
 
 	lis, err := net.Listen("tcp", addr)
 	if err != nil {

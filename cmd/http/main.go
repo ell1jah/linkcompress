@@ -12,7 +12,7 @@ import (
 	"go.uber.org/zap"
 )
 
-const port = ":8080"
+const port = ":8081"
 
 func main() {
 	zapLogger := zap.Must(zap.NewDevelopment())
