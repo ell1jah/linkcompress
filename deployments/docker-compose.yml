@@ -1,0 +1,27 @@
+version: "3.3"
+services:
+  db:
+    image: linksdb:latest
+    volumes:
+      - data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+#   grpc:
+#     image: grpclinks:latest
+#     ports:
+#       - 50051:50051
+#     depends_on:
+#       - db
+
+#   http:
+#     image: httplinks:latest
+#     ports:
+#       - 8081:8081
+#     depends_on:
+#       - grpc
+
+volumes:
+  data: {}
+
+# docker-compose -f ./deployments/docker-compose.yml up
