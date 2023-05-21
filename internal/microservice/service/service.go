@@ -9,7 +9,7 @@ import (
 
 const compressedLen = 10
 
-var compressedLinkChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+var compressedLinkChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_"
 
 type LinkRepo interface {
 	GetOriginal(domain.Link) (domain.Link, error)
@@ -57,11 +57,11 @@ func letterI(char byte) (int, error) {
 }
 
 func (ls *LinkService) genNewCompressed(last domain.Link) (domain.Link, error) {
-	res := make([]rune, compressedLen)
+	res := []rune(last)
 
 	overflowFlag := true
 
-	for i := compressedLen - 1; i >= 0; i-- {
+	for i := len(last) - 1; i >= 0; i-- {
 		if last[i] == compressedLinkChars[len(compressedLinkChars)-1] {
 			res[i] = rune(compressedLinkChars[0])
 		} else {
@@ -115,7 +115,7 @@ func (ls *LinkService) Compress(src domain.Link) (domain.Link, error) {
 	if last == "" {
 		res = ls.genFirstCompressed()
 	} else {
-		res, err = ls.genNewCompressed(src)
+		res, err = ls.genNewCompressed(last)
 		if err != nil {
 			ls.logger.Errorw("LinkService err",
 				"method", "Compress",
