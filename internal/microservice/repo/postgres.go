@@ -9,7 +9,7 @@ import (
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
-const dataSource = "host=localhost port=5432 dbname=links user=docker password=postgres"
+const dataSource = "host=db port=5432 dbname=links user=docker password=postgres"
 const driver = "pgx"
 
 type PostgresRepo struct {

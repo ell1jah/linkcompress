@@ -9,7 +9,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-const addr = ":50051"
+const addr = "grpc:50051"
 
 type MicroserviceClienLogger interface {
 	Infow(string, ...interface{})

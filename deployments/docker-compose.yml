@@ -2,8 +2,6 @@ version: "3.3"
 services:
   db:
     image: ell1jah/linksdb:latest
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
     ports:
       - "5432:5432"
     expose:
@@ -13,8 +11,6 @@ services:
 
   grpc:
     image: ell1jah/grpclinks:latest
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
     ports:
       - 50051:50051
     expose:
@@ -33,3 +29,5 @@ services:
 
 volumes:
   data: {}
+
+# curl -X POST http://localhost:8081/ -d '{"link": "https://github.com/"}'
