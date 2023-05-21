@@ -23,7 +23,7 @@ type LinkTransport struct {
 	logger      LinkTransportLogger
 }
 
-func NewLinkService(linkService LinkService, logger LinkTransportLogger) *LinkTransport {
+func NewLinkTransport(linkService LinkService, logger LinkTransportLogger) *LinkTransport {
 	return &LinkTransport{
 		linkService: linkService,
 		logger:      logger,
