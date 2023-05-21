@@ -1,2 +1,37 @@
 # linkcompress
-Service that provides an API for creating shortened links
+Сервис, предоставляющий API по созданию сокращённых ссылок.
+
+## Описание
+Работает на порту 8081.
+
+1. Метод Post, который сохраняет оригинальный URL в базе и возвращает сокращённый.
+2. Метод Get, который принимает сокращённый URL и возвращает оригинальный.
+
+Передача и возврат ссылки осуществляется через тело запроса в формате json таким образом:
+
+{"link": "XXX"}
+
+где XXX - сама ссылка
+
+## Примеры
+
+Запрос:
+
+curl -X POST http://localhost:8081/ -d '{"link": "https://github.com/"}'
+
+Ответ:
+
+{"link": "AAAAAAAAAA"}
+
+Запрос:
+
+curl -X GET http://localhost:8081/ -d '{"link": "AAAAAAAAAA"}'
+
+Ответ:
+
+{"link": "https://github.com/"}
+
+## Опции
+Может работать, используя im-memory хранилище, а может, используя postgres. Для этого при запуске grpc сервиса надо указать флаг stor, где
+ - "postgres" - Postgres
+ - "inmem" - In-Memory
