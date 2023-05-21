@@ -1,27 +1,35 @@
 version: "3.3"
 services:
   db:
-    image: linksdb:latest
-    volumes:
-      - data:/var/lib/postgresql/data
+    image: ell1jah/linksdb:latest
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     ports:
       - "5432:5432"
+    expose:
+      - 5432
+    volumes:
+      - data:/var/lib/postgresql/data
 
-#   grpc:
-#     image: grpclinks:latest
-#     ports:
-#       - 50051:50051
-#     depends_on:
-#       - db
+  grpc:
+    image: ell1jah/grpclinks:latest
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - 50051:50051
+    expose:
+      - 50051
+    depends_on:
+      - db
 
-#   http:
-#     image: httplinks:latest
-#     ports:
-#       - 8081:8081
-#     depends_on:
-#       - grpc
+  http:
+    image: ell1jah/httplinks:latest
+    ports:
+      - 8081:8081
+    expose:
+      - 8081
+    depends_on:
+      - grpc
 
 volumes:
   data: {}
-
-# docker-compose -f ./deployments/docker-compose.yml up
