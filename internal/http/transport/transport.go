@@ -65,7 +65,7 @@ func (lh *LinkHandler) Get(w http.ResponseWriter, r *http.Request) {
 			"calling", "lh.linkService.Original",
 			"src link", reqBody.Link,
 			"error", err)
-		http.Error(w, "unknown error", http.StatusInternalServerError)
+		http.Error(w, "bad data", http.StatusBadRequest)
 		return
 	}
 
@@ -133,7 +133,7 @@ func (lh *LinkHandler) Post(w http.ResponseWriter, r *http.Request) {
 			"calling", "lh.linkService.Compress",
 			"src link", reqBody.Link,
 			"error", err)
-		http.Error(w, "unknown error", http.StatusInternalServerError)
+		http.Error(w, "bad data", http.StatusBadRequest)
 		return
 	}
 
